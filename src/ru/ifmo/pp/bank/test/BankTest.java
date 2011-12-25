@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import ru.ifmo.pp.bank.Bank;
+import ru.ifmo.pp.bank.Snapshot;
 
 @RunWith(JUnit4.class)
 public class BankTest {
@@ -190,5 +191,43 @@ public class BankTest {
 		b.deposit(0, 1);
 		b.deposit(1, Bank.MAX_AMOUNT);
 		b.transfer(0, 1, 1);
+	}
+
+	@Test
+	public void testSnapshot1() {
+		Bank b = new Bank(2);
+		Snapshot s = b.snapshot();
+		Assert.assertEquals(s.getAmount(0), 0);
+		Assert.assertEquals(s.getAmount(1), 0);
+		b.deposit(0, 5);
+		b.deposit(1, 10);
+		s = b.snapshot();
+		Assert.assertEquals(s.getAmount(0), 5);
+		Assert.assertEquals(s.getAmount(1), 10);
+	}
+
+	@Test
+	public void testSnapshot2() {
+		final int ACC = 10;
+		Bank b = new Bank(ACC);
+		for (int i = 0; i < 100000; ++i) {
+			for (int j = 0; j < ACC; ++j) {
+				b.deposit(j, 1);
+			}
+			Snapshot s = b.snapshot();
+			for (int j = 0; j < ACC; ++j) {
+				Assert.assertEquals(s.getAmount(j), i + 1);
+			}
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testSnapshotIllegalArgumentException1() {
+		new Bank(1).snapshot().getAmount(-1);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testSnapshotIllegalArgumentException2() {
+		new Bank(1).snapshot().getAmount(1);
 	}
 }
