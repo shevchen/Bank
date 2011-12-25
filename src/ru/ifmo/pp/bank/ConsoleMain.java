@@ -7,8 +7,19 @@ import java.util.Scanner;
  * Console driver class to test {@link Bank} methods.
  */
 public class ConsoleMain {
+	/**
+	 * Temp bank to test {@link Bank} methods
+	 */
 	private static Bank bank;
 
+	/**
+	 * Try to invoke {@link Bank#deposit(int, long) deposit} method with
+	 * {@link ConsoleMain#bank bank}
+	 * 
+	 * @param command
+	 *            {"deposit", account, amount}
+	 * @return true if operation is successful, false else
+	 */
 	private static boolean tryDeposit(String[] command) {
 		if (command.length != 3) {
 			return false;
@@ -37,6 +48,14 @@ public class ConsoleMain {
 		return true;
 	}
 
+	/**
+	 * Try to invoke {@link Bank#withdraw(int, long)) withdraw} method with
+	 * {@link ConsoleMain#bank bank}
+	 * 
+	 * @param command
+	 *            {"withdraw", account, amount}
+	 * @return true if operation is successful, false else
+	 */
 	private static boolean tryWithdraw(String[] command) {
 		if (command.length != 3) {
 			return false;
@@ -65,6 +84,14 @@ public class ConsoleMain {
 		return true;
 	}
 
+	/**
+	 * Try to invoke {@link Bank#transfer(int, int, long) transfer} method with
+	 * {@link ConsoleMain#bank bank}
+	 * 
+	 * @param command
+	 *            {"transfer", accountFrom, accountTo, amount}
+	 * @return true if operation is successful, false else
+	 */
 	private static boolean tryTransfer(String[] command) {
 		if (command.length != 4) {
 			return false;
@@ -94,6 +121,14 @@ public class ConsoleMain {
 		return true;
 	}
 
+	/**
+	 * Try to invoke {@link Bank#getAmount(int) getAmount} method with
+	 * {@link ConsoleMain#bank bank}
+	 * 
+	 * @param command
+	 *            {"amount", account}
+	 * @return true if operation is successful, false else
+	 */
 	private static boolean tryGetAmount(String[] command) {
 		if (command.length != 2) {
 			return false;
@@ -119,6 +154,14 @@ public class ConsoleMain {
 		return true;
 	}
 
+	/**
+	 * Try to invoke {@link Bank#getTotalAmount() getTotalAmount} method with
+	 * {@link ConsoleMain#bank bank}
+	 * 
+	 * @param command
+	 *            {"total"}
+	 * @return true if operation is successful, false else
+	 */
 	private static boolean tryGetTotalAmount(String[] command) {
 		if (command.length != 1) {
 			return false;
