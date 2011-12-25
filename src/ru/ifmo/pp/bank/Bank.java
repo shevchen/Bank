@@ -12,6 +12,16 @@ public class Bank {
 	public static final long MAX_AMOUNT = 1000000000000000L;
 
 	/**
+	 * The number of changes between two consecutive snapshot refreshes.
+	 */
+	private final int UPDATE_PERIOD = 100;
+
+	/**
+	 * Number of accounts.
+	 */
+	private final int n;
+
+	/**
 	 * Current money amounts for all accounts.
 	 */
 	private volatile AtomicLongArray money;
@@ -22,9 +32,9 @@ public class Bank {
 	private volatile long totalAmount;
 
 	/**
-	 * Current snapshot;
+	 * Current snapshot.
 	 */
-	private volatile Snapshot snapshot;
+	private volatile Snapshot curSnapshot;
 
 	/**
 	 * Creates new bank instance.
@@ -36,9 +46,10 @@ public class Bank {
 		if (n < 0) {
 			n = 0;
 		}
+		this.n = n;
 		money = new AtomicLongArray(n);
 		totalAmount = 0;
-		snapshot = new Snapshot();
+		curSnapshot = new Snapshot(money);
 	}
 
 	/**
@@ -51,7 +62,7 @@ public class Bank {
 	 *             when i is invalid index.
 	 */
 	public long getAmount(int i) {
-		if (i < 0 || i >= money.length()) {
+		if (i < 0 || i >= n) {
 			throw new IllegalArgumentException("Invalid index: " + i);
 		}
 		return money.get(i);
@@ -65,12 +76,27 @@ public class Bank {
 	}
 
 	/**
-	 * Returns snapshot of all accounts in bank.
+	 * Returns snapshot of all accounts in bank. Creates a new Snapshot object
+	 * if and only if there were some deposit changes; never changes any data
+	 * itself.
 	 * 
 	 * @return snapshot of amounts in all accounts.
 	 */
 	public Snapshot snapshot() {
-		return snapshot;
+		Snapshot s = curSnapshot;
+		return new Snapshot(s, s.getVersion().get());
+	}
+
+	/**
+	 * Checks and, if necessary, updates the current snapshot.
+	 */
+	private void checkForUpdate() {
+		long version = curSnapshot.getVersion().get();
+		if (version % UPDATE_PERIOD == 0) {
+			Snapshot s = new Snapshot(curSnapshot, version);
+			s.applyChanges();
+			curSnapshot = s;
+		}
 	}
 
 	/**
@@ -88,7 +114,7 @@ public class Bank {
 	 *             when deposit will overflow account above {@link #MAX_AMOUNT}.
 	 */
 	public synchronized long deposit(int i, long amount) {
-		if (i < 0 || i >= money.length()) {
+		if (i < 0 || i >= n) {
 			throw new IllegalArgumentException("Invalid index: " + i);
 		}
 		if (amount <= 0 || amount > MAX_AMOUNT) {
@@ -102,6 +128,10 @@ public class Bank {
 		}
 		money.set(i, newValue);
 		totalAmount += newValue;
+		ChangeEvent event = new ChangeEvent(curSnapshot.getVersion()
+				.incrementAndGet(), i, amount);
+		curSnapshot.addEvent(event);
+		checkForUpdate();
 		return newValue;
 	}
 
@@ -120,7 +150,7 @@ public class Bank {
 	 *             when account does not have enough to withdraw.
 	 */
 	public synchronized long withdraw(int i, long amount) {
-		if (i < 0 || i >= money.length()) {
+		if (i < 0 || i >= n) {
 			throw new IllegalArgumentException("Invalid index: " + i);
 		}
 		if (amount <= 0 || amount > MAX_AMOUNT) {
@@ -133,6 +163,10 @@ public class Bank {
 		}
 		money.set(i, newValue);
 		totalAmount -= amount;
+		ChangeEvent event = new ChangeEvent(curSnapshot.getVersion()
+				.incrementAndGet(), i, -amount);
+		curSnapshot.addEvent(event);
+		checkForUpdate();
 		return newValue;
 	}
 
@@ -153,10 +187,10 @@ public class Bank {
 	 *             in target one.
 	 */
 	public synchronized void transfer(int fromIndex, int toIndex, long amount) {
-		if (fromIndex < 0 || fromIndex >= money.length()) {
+		if (fromIndex < 0 || fromIndex >= n) {
 			throw new IllegalArgumentException("Invalid index: " + fromIndex);
 		}
-		if (toIndex < 0 || toIndex >= money.length()) {
+		if (toIndex < 0 || toIndex >= n) {
 			throw new IllegalArgumentException("Invalid index: " + toIndex);
 		}
 		if (amount <= 0 || amount > MAX_AMOUNT) {
@@ -179,5 +213,12 @@ public class Bank {
 		}
 		money.set(fromIndex, newFromValue);
 		money.set(toIndex, newToValue);
+		ChangeEvent event1 = new ChangeEvent(curSnapshot.getVersion()
+				.incrementAndGet(), fromIndex, -amount);
+		ChangeEvent event2 = new ChangeEvent(curSnapshot.getVersion().get(),
+				toIndex, amount);
+		curSnapshot.addEvent(event1);
+		curSnapshot.addEvent(event2);
+		checkForUpdate();
 	}
 }

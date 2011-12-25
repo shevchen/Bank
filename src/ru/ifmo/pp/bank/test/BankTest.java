@@ -338,7 +338,7 @@ public class BankTest {
 		}
 		MultiThreadedTestRunner runner = new MultiThreadedTestRunner(runnables);
 		runner.runTestRunnables();
-		Assert.assertEquals(b.getAmount(0), 1000);
+		Assert.assertEquals(b.getAmount(0), 10000);
 		Assert.assertEquals(b.getAmount(1), 0);
 	}
 
