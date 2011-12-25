@@ -163,21 +163,36 @@ public class BankTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testTransferIllegalArgumentException2() {
-		new Bank(1).transfer(0, 1, 1);
+		new Bank(1).transfer(1, 0, 1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testTransferIllegalArgumentException3() {
-		new Bank(1).transfer(0, 0, 0);
+		new Bank(1).transfer(0, -1, 1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testTransferIllegalArgumentException4() {
-		new Bank(1).transfer(0, 0, -10);
+		new Bank(1).transfer(0, 1, 1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testTransferIllegalArgumentException5() {
+		new Bank(1).transfer(-1, 1, 1);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testTransferIllegalArgumentException6() {
+		new Bank(1).transfer(0, 0, 0);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testTransferIllegalArgumentException7() {
+		new Bank(1).transfer(0, 0, -10);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testTransferIllegalArgumentException8() {
 		new Bank(1).transfer(0, 0, Bank.MAX_AMOUNT + 1);
 	}
 
