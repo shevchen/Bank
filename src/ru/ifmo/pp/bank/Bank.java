@@ -128,9 +128,8 @@ public class Bank {
 		}
 		money.set(i, newValue);
 		totalAmount += newValue;
-		ChangeEvent event = new ChangeEvent(curSnapshot.getVersion()
-				.incrementAndGet(), i, amount);
-		curSnapshot.addEvent(event);
+		curSnapshot.addEvent(new ChangeEvent(curSnapshot.getVersion()
+				.incrementAndGet(), i, amount));
 		checkForUpdate();
 		return newValue;
 	}
@@ -163,9 +162,8 @@ public class Bank {
 		}
 		money.set(i, newValue);
 		totalAmount -= amount;
-		ChangeEvent event = new ChangeEvent(curSnapshot.getVersion()
-				.incrementAndGet(), i, -amount);
-		curSnapshot.addEvent(event);
+		curSnapshot.addEvent(new ChangeEvent(curSnapshot.getVersion()
+				.incrementAndGet(), i, -amount));
 		checkForUpdate();
 		return newValue;
 	}
@@ -213,10 +211,11 @@ public class Bank {
 		}
 		money.set(fromIndex, newFromValue);
 		money.set(toIndex, newToValue);
-		ChangeEvent event1 = new ChangeEvent(curSnapshot.getVersion()
-				.incrementAndGet(), fromIndex, -amount);
-		ChangeEvent event2 = new ChangeEvent(curSnapshot.getVersion().get(),
-				toIndex, amount);
+		ChangeEvent event1 = new ChangeEvent(
+				curSnapshot.getVersion().get() + 1, fromIndex, -amount);
+		ChangeEvent event2 = new ChangeEvent(
+				curSnapshot.getVersion().get() + 1, toIndex, amount);
+		curSnapshot.getVersion().incrementAndGet();
 		curSnapshot.addEvent(event1);
 		curSnapshot.addEvent(event2);
 		checkForUpdate();
