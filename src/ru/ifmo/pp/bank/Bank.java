@@ -1,10 +1,30 @@
 package ru.ifmo.pp.bank;
 
+import java.util.concurrent.atomic.AtomicLongArray;
+
 /**
  * Bank data structure.
  */
 public class Bank {
+	/**
+	 * Maximum money amount per account.
+	 */
 	public static final long MAX_AMOUNT = 1000000000000000L;
+
+	/**
+	 * Current money amounts for all accounts.
+	 */
+	private volatile AtomicLongArray money;
+
+	/**
+	 * Total money amount.
+	 */
+	private volatile long totalAmount;
+
+	/**
+	 * Current snapshot;
+	 */
+	private volatile Snapshot snapshot;
 
 	/**
 	 * Creates new bank instance.
@@ -12,7 +32,13 @@ public class Bank {
 	 * @param n
 	 *            the number of accounts (numbered from 0 to n-1).
 	 */
-	public Bank(int n) { /* todo */
+	public Bank(int n) {
+		if (n < 0) {
+			n = 0;
+		}
+		money = new AtomicLongArray(n);
+		totalAmount = 0;
+		snapshot = new Snapshot();
 	}
 
 	/**
@@ -24,15 +50,18 @@ public class Bank {
 	 * @throws IllegalArgumentException
 	 *             when i is invalid index.
 	 */
-	public long getAmount(int i) { /* todo */
-		return 0;
+	public long getAmount(int i) {
+		if (i < 0 || i >= money.length()) {
+			throw new IllegalArgumentException("Invalid index: " + i);
+		}
+		return money.get(i);
 	}
 
 	/**
 	 * Returns total amount deposited in bank.
 	 */
-	public long getTotalAmount() { /* todo */
-		return 0;
+	public long getTotalAmount() {
+		return totalAmount;
 	}
 
 	/**
@@ -40,8 +69,8 @@ public class Bank {
 	 * 
 	 * @return snapshot of amounts in all accounts.
 	 */
-	public Snapshot snapshot() { /* todo */
-		return null;
+	public Snapshot snapshot() {
+		return snapshot;
 	}
 
 	/**
@@ -58,8 +87,22 @@ public class Bank {
 	 * @throws IllegalStateException
 	 *             when deposit will overflow account above {@link #MAX_AMOUNT}.
 	 */
-	public long deposit(int i, long amount) { /* todo */
-		return 0;
+	public synchronized long deposit(int i, long amount) {
+		if (i < 0 || i >= money.length()) {
+			throw new IllegalArgumentException("Invalid index: " + i);
+		}
+		if (amount <= 0 || amount > MAX_AMOUNT) {
+			throw new IllegalArgumentException("Invalid amount: " + amount);
+		}
+		long newValue = money.get(i) + amount;
+		if (newValue > MAX_AMOUNT) {
+			throw new IllegalStateException(
+					"Illegal operation: money amount can't overflow "
+							+ MAX_AMOUNT);
+		}
+		money.set(i, newValue);
+		totalAmount += newValue;
+		return newValue;
 	}
 
 	/**
@@ -76,8 +119,21 @@ public class Bank {
 	 * @throws IllegalStateException
 	 *             when account does not have enough to withdraw.
 	 */
-	public long withdraw(int i, long amount) { /* todo */
-		return 0;
+	public synchronized long withdraw(int i, long amount) {
+		if (i < 0 || i >= money.length()) {
+			throw new IllegalArgumentException("Invalid index: " + i);
+		}
+		if (amount <= 0 || amount > MAX_AMOUNT) {
+			throw new IllegalArgumentException("Invalid amount: " + amount);
+		}
+		long newValue = money.get(i) - amount;
+		if (newValue < 0) {
+			throw new IllegalStateException(
+					"Illegal operation: not enough money to withdraw " + amount);
+		}
+		money.set(i, newValue);
+		totalAmount -= amount;
+		return newValue;
 	}
 
 	/**
@@ -96,6 +152,32 @@ public class Bank {
 	 *             when there is not enough funds in source account or too much
 	 *             in target one.
 	 */
-	public void transfer(int fromIndex, int toIndex, long amount) { /* todo */
+	public synchronized void transfer(int fromIndex, int toIndex, long amount) {
+		if (fromIndex < 0 || fromIndex >= money.length()) {
+			throw new IllegalArgumentException("Invalid index: " + fromIndex);
+		}
+		if (toIndex < 0 || toIndex >= money.length()) {
+			throw new IllegalArgumentException("Invalid index: " + toIndex);
+		}
+		if (amount <= 0 || amount > MAX_AMOUNT) {
+			throw new IllegalArgumentException("Invalid amount: " + amount);
+		}
+		if (fromIndex == toIndex) {
+			return;
+		}
+		long newFromValue = money.get(fromIndex) - amount;
+		if (newFromValue < 0) {
+			throw new IllegalStateException(
+					"Illegal operation: not enough money to withdraw " + amount
+							+ " from account " + fromIndex);
+		}
+		long newToValue = money.get(toIndex) + amount;
+		if (newToValue > MAX_AMOUNT) {
+			throw new IllegalStateException(
+					"Illegal operation: money amount can't overflow "
+							+ MAX_AMOUNT);
+		}
+		money.set(fromIndex, newFromValue);
+		money.set(toIndex, newToValue);
 	}
 }

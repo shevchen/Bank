@@ -1,9 +1,22 @@
 package ru.ifmo.pp.bank;
 
+import java.util.List;
+
 /**
  * Snapshot data structure.
  */
 public class Snapshot {
+
+	/**
+	 * Amounts of money for every account.
+	 */
+	private long[] accounts;
+
+	/**
+	 * New events of account changes.
+	 */
+	private List<ChangeEvent> events;
+
 	/**
 	 * Returns amount in account as of snapshot.
 	 * 
