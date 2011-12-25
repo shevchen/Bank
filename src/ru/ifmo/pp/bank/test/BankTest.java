@@ -337,7 +337,7 @@ public class BankTest {
 			public void runTest() throws Throwable {
 				for (int i = 0; i < 1000; ++i) {
 					for (int j = 0; j < ACC; ++j) {
-						b.deposit(ACC, 1);
+						b.deposit(j, 1);
 					}
 				}
 			}
