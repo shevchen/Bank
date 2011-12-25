@@ -1,5 +1,8 @@
 package ru.ifmo.pp.bank.test;
 
+import net.sourceforge.groboutils.junit.v1.MultiThreadedTestRunner;
+import net.sourceforge.groboutils.junit.v1.TestRunnable;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -229,5 +232,138 @@ public class BankTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testSnapshotIllegalArgumentException2() {
 		new Bank(1).snapshot().getAmount(1);
+	}
+
+	@Test
+	public void testSyncOperations1() throws Throwable {
+		final Bank b = new Bank(1);
+		TestRunnable[] runnables = new TestRunnable[10];
+		for (int i = 0; i < 10; ++i) {
+			runnables[i] = new TestRunnable() {
+				@Override
+				public void runTest() throws Throwable {
+					for (int i = 0; i < 1000; ++i) {
+						b.deposit(0, 1);
+					}
+				}
+			};
+		}
+		MultiThreadedTestRunner runner = new MultiThreadedTestRunner(runnables);
+		runner.runTestRunnables();
+		Assert.assertEquals(b.getAmount(0), 10000);
+	}
+
+	@Test
+	public void testSyncOperations2() throws Throwable {
+		final Bank b = new Bank(2);
+		TestRunnable[] runnables = new TestRunnable[40];
+		for (int i = 0; i < 10; ++i) {
+			runnables[i] = new TestRunnable() {
+				@Override
+				public void runTest() throws Throwable {
+					for (int i = 0; i < 2000; ++i) {
+						b.deposit(0, 1);
+					}
+				}
+			};
+		}
+		for (int i = 10; i < 20; ++i) {
+			runnables[i] = new TestRunnable() {
+				@Override
+				public void runTest() throws Throwable {
+					for (int i = 0; i < 500; ++i) {
+						boolean succeeded = false;
+						do {
+							succeeded = true;
+							try {
+								b.transfer(0, 1, 1);
+							} catch (IllegalStateException e) {
+								succeeded = false;
+							}
+						} while (!succeeded);
+					}
+				}
+			};
+		}
+		for (int i = 20; i < 30; ++i) {
+			runnables[i] = new TestRunnable() {
+				@Override
+				public void runTest() throws Throwable {
+					for (int i = 0; i < 500; ++i) {
+						boolean succeeded = false;
+						do {
+							succeeded = true;
+							try {
+								b.withdraw(0, 1);
+							} catch (IllegalStateException e) {
+								succeeded = false;
+							}
+						} while (!succeeded);
+					}
+				}
+			};
+		}
+		for (int i = 30; i < 40; ++i) {
+			runnables[i] = new TestRunnable() {
+				@Override
+				public void runTest() throws Throwable {
+					for (int i = 0; i < 500; ++i) {
+						boolean succeeded = false;
+						do {
+							succeeded = true;
+							try {
+								b.withdraw(1, 1);
+							} catch (IllegalStateException e) {
+								succeeded = false;
+							}
+						} while (!succeeded);
+					}
+				}
+			};
+		}
+		MultiThreadedTestRunner runner = new MultiThreadedTestRunner(runnables);
+		runner.runTestRunnables();
+		Assert.assertEquals(b.getAmount(0), 1000);
+		Assert.assertEquals(b.getAmount(1), 0);
+	}
+
+	@Test
+	public void testSyncOperations3() throws Throwable {
+		final int ACC = 10;
+		final Bank b = new Bank(ACC);
+		TestRunnable[] runnables = new TestRunnable[2];
+		runnables[0] = new TestRunnable() {
+			@Override
+			public void runTest() throws Throwable {
+				for (int i = 0; i < 1000; ++i) {
+					for (int j = 0; j < ACC; ++j) {
+						b.deposit(ACC, 1);
+					}
+				}
+			}
+		};
+		runnables[1] = new TestRunnable() {
+			@Override
+			public void runTest() throws Throwable {
+				for (int i = 0; i < 100; ++i) {
+					Snapshot s = b.snapshot();
+					long min = Long.MAX_VALUE;
+					long max = Long.MIN_VALUE;
+					for (int j = 0; j < ACC; ++j) {
+						long amount = s.getAmount(j);
+						if (amount > max) {
+							max = amount;
+						}
+						if (amount < min) {
+							min = amount;
+						}
+					}
+					Assert.assertTrue(max >= min);
+					Assert.assertTrue(max - min <= 1);
+				}
+			}
+		};
+		MultiThreadedTestRunner runner = new MultiThreadedTestRunner(runnables);
+		runner.runTestRunnables();
 	}
 }
