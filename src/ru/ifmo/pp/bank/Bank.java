@@ -47,7 +47,7 @@ public class Bank {
 			n = 0;
 		}
 		this.n = n;
-		UPDATE_PERIOD = this.n;
+		UPDATE_PERIOD = n;
 		money = new AtomicLongArray(n);
 		totalAmount = 0;
 		curSnapshot = new Snapshot(money, 0L);
@@ -85,14 +85,14 @@ public class Bank {
 	 */
 	public Snapshot snapshot() {
 		Snapshot s = curSnapshot;
-		return new Snapshot(s, s.getVersion().get());
+		return new Snapshot(s, s.getVersion());
 	}
 
 	/**
 	 * Checks and, if necessary, updates the current snapshot.
 	 */
 	private void checkForUpdate() {
-		long version = curSnapshot.getVersion().get();
+		long version = curSnapshot.getVersion();
 		if (version % UPDATE_PERIOD == 0) {
 			curSnapshot = new Snapshot(money, version);
 		}
@@ -127,8 +127,7 @@ public class Bank {
 		}
 		money.set(i, newValue);
 		totalAmount += newValue;
-		curSnapshot.addEvent(new ChangeEvent(curSnapshot.getVersion()
-				.incrementAndGet(), i, amount));
+		curSnapshot.addEvent(new ChangeEvent(curSnapshot.incrementAndGetVersion(), i, amount));
 		checkForUpdate();
 		return newValue;
 	}
@@ -161,8 +160,7 @@ public class Bank {
 		}
 		money.set(i, newValue);
 		totalAmount -= amount;
-		curSnapshot.addEvent(new ChangeEvent(curSnapshot.getVersion()
-				.incrementAndGet(), i, -amount));
+		curSnapshot.addEvent(new ChangeEvent(curSnapshot.incrementAndGetVersion(), i, -amount));
 		checkForUpdate();
 		return newValue;
 	}
@@ -214,7 +212,7 @@ public class Bank {
 				curSnapshot.getVersion().get() + 1, fromIndex, -amount));
 		curSnapshot.addEvent(new ChangeEvent(
 				curSnapshot.getVersion().get() + 1, toIndex, amount));
-		curSnapshot.getVersion().incrementAndGet();
+		curSnapshot.getVersion().incrementAndGetVersion();
 		checkForUpdate();
 	}
 }

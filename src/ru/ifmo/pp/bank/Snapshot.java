@@ -2,7 +2,6 @@ package ru.ifmo.pp.bank;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLongArray;
 
 /**
@@ -12,7 +11,7 @@ public class Snapshot {
 	/**
 	 * Snapshot version.
 	 */
-	private volatile AtomicLong version;
+	private volatile long version;
 
 	/**
 	 * Amounts of money for every account.
@@ -31,7 +30,7 @@ public class Snapshot {
 	 *            an old snapshot
 	 */
 	public Snapshot(Snapshot s, long version) {
-		this.version = new AtomicLong(version);
+		this.version = version;
 		this.accounts = s.getAccounts();
 		this.events = s.getEvents();
 	}
@@ -47,7 +46,7 @@ public class Snapshot {
 	 *            change events
 	 */
 	public Snapshot(AtomicLongArray accounts, long version) {
-		this.version = new AtomicLong(version);
+		this.version = version;
 		this.accounts = new long[accounts.length()];
 		for (int i = 0; i < this.accounts.length; ++i) {
 			this.accounts[i] = accounts.get(i);
@@ -60,7 +59,7 @@ public class Snapshot {
 	 * 
 	 * @return current version
 	 */
-	public AtomicLong getVersion() {
+	public long getVersion() {
 		return version;
 	}
 
@@ -116,5 +115,9 @@ public class Snapshot {
 			}
 		}
 		return result;
+	}
+
+	public long incrementAndGetVersion() {
+		return ++version;
 	}
 }
