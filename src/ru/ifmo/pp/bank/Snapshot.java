@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicLongArray;
  * Snapshot data structure.
  */
 public class Snapshot {
+
+	private final boolean isMutable;
 	/**
 	 * Snapshot version.
 	 */
@@ -33,10 +35,11 @@ public class Snapshot {
 	 *            change events
 	 */
 	public Snapshot(long version, AtomicLongArray money,
-			List<List<UpdateEvent>> events) {
+			List<List<UpdateEvent>> events, boolean isMutable) {
 		this.version = version;
 		this.money = money;
 		this.events = events;
+		this.isMutable = isMutable;
 	}
 
 	/**
@@ -47,28 +50,11 @@ public class Snapshot {
 	 * @param actualVersion
 	 *            actual bank version
 	 */
-	public Snapshot(Snapshot oldSnapshot, long actualVersion) {
-		this.money = oldSnapshot.getDeposits();
-		this.events = oldSnapshot.getEvents();
+	public Snapshot(Snapshot oldSnapshot, long actualVersion, boolean isMutable) {
+		this.money = oldSnapshot.money;
+		this.events = oldSnapshot.events;
 		this.version = actualVersion;
-	}
-
-	/**
-	 * Retrieves all the deposits.
-	 * 
-	 * @return money on deposits at the last update
-	 */
-	public AtomicLongArray getDeposits() {
-		return money;
-	}
-
-	/**
-	 * Retrieves all changes.
-	 * 
-	 * @return all changes made since the last update
-	 */
-	public List<List<UpdateEvent>> getEvents() {
-		return events;
+		this.isMutable = isMutable;
 	}
 
 	/**
@@ -80,6 +66,9 @@ public class Snapshot {
 	 *            change event
 	 */
 	public void addEvent(int account, UpdateEvent e) {
+		if (!isMutable) {
+			throw new UnsupportedOperationException();
+		}
 		events.get(account).add(e);
 	}
 

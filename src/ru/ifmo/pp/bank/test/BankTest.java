@@ -10,6 +10,7 @@ import org.junit.runners.JUnit4;
 
 import ru.ifmo.pp.bank.Bank;
 import ru.ifmo.pp.bank.Snapshot;
+import ru.ifmo.pp.bank.UpdateEvent;
 
 @RunWith(JUnit4.class)
 public class BankTest {
@@ -238,6 +239,11 @@ public class BankTest {
 				Assert.assertEquals(s.getAmount(j), i + 1);
 			}
 		}
+	}
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void testSnapshotUnsupportedOperationException() {
+		new Bank(1).snapshot().addEvent(0, new UpdateEvent(0L, 1L));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

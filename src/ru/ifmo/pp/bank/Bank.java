@@ -53,7 +53,7 @@ public class Bank {
 		money = new AtomicLongArray(n);
 		totalAmount = 0;
 		localSnapshot = new Snapshot(actualVersion, new AtomicLongArray(n),
-				createList());
+				createList(), true);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class Bank {
 	 * @return snapshot of the current bank state
 	 */
 	public Snapshot snapshot() {
-		return new Snapshot(localSnapshot, actualVersion);
+		return new Snapshot(localSnapshot, actualVersion, false);
 	}
 
 	/**
@@ -110,7 +110,8 @@ public class Bank {
 			for (int i = 0; i < n; ++i) {
 				newArray.set(i, money.get(i));
 			}
-			localSnapshot = new Snapshot(actualVersion, newArray, createList());
+			localSnapshot = new Snapshot(actualVersion, newArray, createList(),
+					true);
 		}
 	}
 
