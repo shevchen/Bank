@@ -29,11 +29,6 @@ public class Bank {
 	private volatile AtomicLongArray money;
 
 	/**
-	 * Deposit updates.
-	 */
-	private volatile List<List<ChangeEvent>> changes;
-
-	/**
 	 * Total money amount.
 	 */
 	private volatile long totalAmount;
@@ -56,18 +51,17 @@ public class Bank {
 		this.n = n;
 		actualVersion = 0;
 		money = new AtomicLongArray(n);
-		changes = createList();
 		totalAmount = 0;
 		localSnapshot = new Snapshot(actualVersion, new AtomicLongArray(n),
-				changes);
+				createList());
 	}
 
 	private List<List<ChangeEvent>> createList() {
-		List<List<ChangeEvent>> changes = new LinkedList<List<ChangeEvent>>();
+		List<List<ChangeEvent>> list = new LinkedList<List<ChangeEvent>>();
 		for (int i = 0; i < n; ++i) {
-			changes.add(new LinkedList<ChangeEvent>());
+			list.add(new LinkedList<ChangeEvent>());
 		}
-		return changes;
+		return list;
 	}
 
 	/**
@@ -113,8 +107,7 @@ public class Bank {
 			for (int i = 0; i < n; ++i) {
 				newArray.set(i, money.get(i));
 			}
-			changes = createList();
-			localSnapshot = new Snapshot(actualVersion, newArray, changes);
+			localSnapshot = new Snapshot(actualVersion, newArray, createList());
 		}
 	}
 
@@ -148,7 +141,7 @@ public class Bank {
 		money.set(i, newValue);
 		totalAmount += amount;
 		long v = actualVersion + 1;
-		changes.get(i).add(new ChangeEvent(v, amount));
+		localSnapshot.addEvent(i, new ChangeEvent(v, amount));
 		actualVersion = v;
 		checkForUpdate();
 		return newValue;
@@ -183,7 +176,7 @@ public class Bank {
 		money.set(i, newValue);
 		totalAmount -= amount;
 		long v = actualVersion + 1;
-		changes.get(i).add(new ChangeEvent(v, -amount));
+		localSnapshot.addEvent(i, new ChangeEvent(v, -amount));
 		actualVersion = v;
 		checkForUpdate();
 		return newValue;
@@ -233,8 +226,8 @@ public class Bank {
 		money.set(fromIndex, newFromValue);
 		money.set(toIndex, newToValue);
 		long v = actualVersion + 1;
-		changes.get(fromIndex).add(new ChangeEvent(v, -amount));
-		changes.get(toIndex).add(new ChangeEvent(v, amount));
+		localSnapshot.addEvent(fromIndex, new ChangeEvent(v, -amount));
+		localSnapshot.addEvent(toIndex, new ChangeEvent(v, amount));
 		actualVersion = v;
 		checkForUpdate();
 	}

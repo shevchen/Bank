@@ -72,6 +72,18 @@ public class Snapshot {
 	}
 
 	/**
+	 * Add the specified change event to the events list.
+	 * 
+	 * @param account
+	 *            a changed deposit number
+	 * @param e
+	 *            change event
+	 */
+	public void addEvent(int account, ChangeEvent e) {
+		events.get(account).add(e);
+	}
+
+	/**
 	 * Returns amount in account as of snapshot.
 	 * 
 	 * @param n
