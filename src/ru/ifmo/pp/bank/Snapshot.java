@@ -18,7 +18,7 @@ public class Snapshot {
 	private AtomicLongArray accounts;
 
 	/**
-	 * New events of account changes.
+	 * New events of deposit changes.
 	 */
 	private List<List<ChangeEvent>> events;
 

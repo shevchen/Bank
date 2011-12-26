@@ -56,6 +56,11 @@ public class Bank {
 				createList());
 	}
 
+	/**
+	 * Creates the new list containing n empty sublists.
+	 * 
+	 * @return the new list
+	 */
 	private List<List<ChangeEvent>> createList() {
 		List<List<ChangeEvent>> list = new ArrayList<List<ChangeEvent>>();
 		for (int i = 0; i < n; ++i) {
@@ -88,11 +93,9 @@ public class Bank {
 	}
 
 	/**
-	 * Returns snapshot of all accounts in bank. Creates a new Snapshot object
-	 * if and only if there were some deposit changes; never changes any data
-	 * itself.
+	 * Returns snapshot of all accounts in the bank.
 	 * 
-	 * @return snapshot of amounts in all accounts.
+	 * @return snapshot of the current bank state
 	 */
 	public Snapshot snapshot() {
 		return new Snapshot(localSnapshot, actualVersion);
@@ -112,7 +115,7 @@ public class Bank {
 	}
 
 	/**
-	 * Deposits the specified amount if money to account.
+	 * Deposits the specified amount of money to account.
 	 * 
 	 * @param i
 	 *            account index.

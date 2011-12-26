@@ -1,12 +1,12 @@
 package ru.ifmo.pp.bank;
 
 /**
- * Event about bank account modification.
+ * Event of bank account modification.
  */
 public class ChangeEvent {
 
 	/**
-	 * Version of the snapshot.
+	 * Version of the bank at the moment this change happened.
 	 */
 	private long version;
 
@@ -29,18 +29,18 @@ public class ChangeEvent {
 	}
 
 	/**
-	 * Returns snapshot version.
+	 * Returns a version of the bank at the moment this change happened.
 	 * 
-	 * @return snapshot version
+	 * @return bank version
 	 */
 	public long getVersion() {
 		return version;
 	}
 
 	/**
-	 * Returns the difference.
+	 * Returns the deposit amount difference.
 	 * 
-	 * @return the difference.
+	 * @return the difference
 	 */
 	public long getDifference() {
 		return difference;
