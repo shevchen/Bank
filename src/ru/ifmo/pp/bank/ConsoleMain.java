@@ -5,23 +5,25 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
- * Console driver class to test {@link Bank} methods.
+ * Console utility to test {@link Bank} methods.
  */
 public class ConsoleMain {
 	/**
-	 * Temp bank to test {@link Bank} methods
+	 * A bank instance to test {@link Bank} methods
 	 */
 	private static Bank bank;
 
+	/**
+	 * A collection of snapshots made.
+	 */
 	private static HashMap<String, Snapshot> snapshots;
 
 	/**
-	 * Try to invoke {@link Bank#deposit(int, long) deposit} method with
-	 * {@link ConsoleMain#bank bank}
+	 * Tries to deposit some amount of money to the specified account.
 	 * 
 	 * @param command
 	 *            {"deposit", account, amount}
-	 * @return false if command has wrong format, else true
+	 * @return false if the command has wrong format, true otherwise
 	 */
 	private static boolean tryDeposit(String[] command) {
 		if (command.length != 3) {
@@ -52,12 +54,11 @@ public class ConsoleMain {
 	}
 
 	/**
-	 * Try to invoke {@link Bank#withdraw(int, long)) withdraw} method with
-	 * {@link ConsoleMain#bank bank}
+	 * Tries to withdraw some amount of money from the specified account.
 	 * 
 	 * @param command
 	 *            {"withdraw", account, amount}
-	 * @return false if command has wrong format, else true
+	 * @return false if the command has wrong format, true otherwise
 	 */
 	private static boolean tryWithdraw(String[] command) {
 		if (command.length != 3) {
@@ -88,12 +89,12 @@ public class ConsoleMain {
 	}
 
 	/**
-	 * Try to invoke {@link Bank#transfer(int, int, long) transfer} method with
-	 * {@link ConsoleMain#bank bank}
+	 * Tries to transfer some amount of money from one specified account to
+	 * another.
 	 * 
 	 * @param command
 	 *            {"transfer", accountFrom, accountTo, amount}
-	 * @return false if command has wrong format, else true
+	 * @return false if the command has wrong format, true otherwise
 	 */
 	private static boolean tryTransfer(String[] command) {
 		if (command.length != 4) {
@@ -125,12 +126,11 @@ public class ConsoleMain {
 	}
 
 	/**
-	 * Try to invoke {@link Bank#getAmount(int) getAmount} method with
-	 * {@link ConsoleMain#bank bank}
+	 * Tries to get the amount of money on some deposit.
 	 * 
 	 * @param command
 	 *            {"amount", account}
-	 * @return false if command has wrong format, else true
+	 * @return false if the command has wrong format, true otherwise
 	 */
 	private static boolean tryGetAmount(String[] command) {
 		if (command.length != 2) {
@@ -158,12 +158,11 @@ public class ConsoleMain {
 	}
 
 	/**
-	 * Try to invoke {@link Bank#getTotalAmount() getTotalAmount} method with
-	 * {@link ConsoleMain#bank bank}
+	 * Tries to get the total amount of money in the bank.
 	 * 
 	 * @param command
 	 *            {"total"}
-	 * @return false if command has wrong format, else true
+	 * @return false if the command has wrong format, true otherwise
 	 */
 	private static boolean tryGetTotalAmount(String[] command) {
 		if (command.length != 1) {
@@ -177,12 +176,12 @@ public class ConsoleMain {
 	}
 
 	/**
-	* Try to invoke one of commands with snapshot
-	* 
-	* @param command command to snapshot
-	*
-	* @return false if command has wrong format, else false
-	*/
+	 * Tries to do some snapshot-related operation.
+	 * 
+	 * @param command
+	 *            {"snapshot", ...}
+	 * @return false if the command has wrong format, true otherwise
+	 */
 	private static boolean trySnapshot(String[] command) {
 		if (command.length == 0) {
 			return false;
@@ -193,13 +192,13 @@ public class ConsoleMain {
 		return trySnapshotMake(command) || trySnapshotGetAmount(command);
 	}
 
-        /**
-        * Try to make a snapshot
-        * 
-        * @param command {_, "make", _nameOfSnapshot}
-        *
-        * @return false if command has wrong format, else false
-        */
+	/**
+	 * Tries to make a new snapshot.
+	 * 
+	 * @param command
+	 *            {"snapshot", "make", id}
+	 * @return false if the command has wrong format, true otherwise
+	 */
 	private static boolean trySnapshotMake(String[] command) {
 		if (command.length != 3) {
 			return false;
@@ -213,13 +212,13 @@ public class ConsoleMain {
 		return true;
 	}
 
-        /**
-        * Try to get amount in account as of snapshot
-        * 
-        * @param command {_, "amount", _nameOfSnapshot, _accountNumber}
-        *
-        * @return false if command has wrong format, else false
-        */
+	/**
+	 * Tries to check some deposit from the specified snapshot.
+	 * 
+	 * @param command
+	 *            {"snapshot", "amount", id, account}
+	 * @return false if the command has wrong format, true otherwise
+	 */
 	private static boolean trySnapshotGetAmount(String[] command) {
 		if (command.length != 4) {
 			return false;
@@ -251,12 +250,13 @@ public class ConsoleMain {
 	}
 
 	/**
-	* Prints help.
-	*
-	* @param command {"help"}
-	*
-	* @return false if command has wrong format, else false
-	*/
+	 * Prints help.
+	 * 
+	 * @param command
+	 *            {"help"}
+	 * 
+	 * @return false if the command has wrong format, true otherwise
+	 */
 	private static boolean tryHelp(String[] command) {
 		if (command.length != 1
 				|| command[0].toLowerCase().compareTo("help") != 0) {
