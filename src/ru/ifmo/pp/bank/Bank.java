@@ -61,10 +61,10 @@ public class Bank {
 	 * 
 	 * @return the new list
 	 */
-	private List<List<ChangeEvent>> createList() {
-		List<List<ChangeEvent>> list = new ArrayList<List<ChangeEvent>>();
+	private List<List<UpdateEvent>> createList() {
+		List<List<UpdateEvent>> list = new ArrayList<List<UpdateEvent>>(n);
 		for (int i = 0; i < n; ++i) {
-			list.add(new ArrayList<ChangeEvent>());
+			list.add(new ArrayList<UpdateEvent>());
 		}
 		return list;
 	}
@@ -144,7 +144,7 @@ public class Bank {
 		money.set(i, newValue);
 		totalAmount += amount;
 		long v = actualVersion + 1;
-		localSnapshot.addEvent(i, new ChangeEvent(v, amount));
+		localSnapshot.addEvent(i, new UpdateEvent(v, amount));
 		actualVersion = v;
 		checkForUpdate();
 		return newValue;
@@ -179,7 +179,7 @@ public class Bank {
 		money.set(i, newValue);
 		totalAmount -= amount;
 		long v = actualVersion + 1;
-		localSnapshot.addEvent(i, new ChangeEvent(v, -amount));
+		localSnapshot.addEvent(i, new UpdateEvent(v, -amount));
 		actualVersion = v;
 		checkForUpdate();
 		return newValue;
@@ -229,8 +229,8 @@ public class Bank {
 		money.set(fromIndex, newFromValue);
 		money.set(toIndex, newToValue);
 		long v = actualVersion + 1;
-		localSnapshot.addEvent(fromIndex, new ChangeEvent(v, -amount));
-		localSnapshot.addEvent(toIndex, new ChangeEvent(v, amount));
+		localSnapshot.addEvent(fromIndex, new UpdateEvent(v, -amount));
+		localSnapshot.addEvent(toIndex, new UpdateEvent(v, amount));
 		actualVersion = v;
 		checkForUpdate();
 	}

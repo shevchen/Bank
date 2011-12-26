@@ -15,27 +15,27 @@ public class Snapshot {
 	/**
 	 * Amounts of money for every account.
 	 */
-	private AtomicLongArray accounts;
+	private AtomicLongArray money;
 
 	/**
 	 * New events of deposit changes.
 	 */
-	private List<List<ChangeEvent>> events;
+	private List<List<UpdateEvent>> events;
 
 	/**
 	 * Creates a new bank snapshot.
 	 * 
 	 * @param version
 	 *            snapshot version
-	 * @param accounts
+	 * @param money
 	 *            bank accounts
 	 * @param events
 	 *            change events
 	 */
-	public Snapshot(long version, AtomicLongArray accounts,
-			List<List<ChangeEvent>> events) {
+	public Snapshot(long version, AtomicLongArray money,
+			List<List<UpdateEvent>> events) {
 		this.version = version;
-		this.accounts = accounts;
+		this.money = money;
 		this.events = events;
 	}
 
@@ -48,7 +48,7 @@ public class Snapshot {
 	 *            actual bank version
 	 */
 	public Snapshot(Snapshot oldSnapshot, long actualVersion) {
-		this.accounts = oldSnapshot.getAccounts();
+		this.money = oldSnapshot.getDeposits();
 		this.events = oldSnapshot.getEvents();
 		this.version = actualVersion;
 	}
@@ -58,8 +58,8 @@ public class Snapshot {
 	 * 
 	 * @return money on deposits at the last update
 	 */
-	public AtomicLongArray getAccounts() {
-		return accounts;
+	public AtomicLongArray getDeposits() {
+		return money;
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class Snapshot {
 	 * 
 	 * @return all changes made since the last update
 	 */
-	public List<List<ChangeEvent>> getEvents() {
+	public List<List<UpdateEvent>> getEvents() {
 		return events;
 	}
 
@@ -79,7 +79,7 @@ public class Snapshot {
 	 * @param e
 	 *            change event
 	 */
-	public void addEvent(int account, ChangeEvent e) {
+	public void addEvent(int account, UpdateEvent e) {
 		events.get(account).add(e);
 	}
 
@@ -93,12 +93,12 @@ public class Snapshot {
 	 *             when n is invalid index.
 	 */
 	public long getAmount(int n) {
-		if (n < 0 || n >= accounts.length()) {
+		if (n < 0 || n >= money.length()) {
 			throw new IllegalArgumentException("Invalid index: " + n);
 		}
-		long result = accounts.get(n);
+		long result = money.get(n);
 		for (int i = 0; i < events.get(n).size(); ++i) {
-			ChangeEvent e = events.get(n).get(i);
+			UpdateEvent e = events.get(n).get(i);
 			if (e.getVersion() > version) {
 				break;
 			}

@@ -3,7 +3,7 @@ package ru.ifmo.pp.bank;
 /**
  * Event of bank account modification.
  */
-public class ChangeEvent {
+public class UpdateEvent {
 
 	/**
 	 * Version of the bank at the moment this change happened.
@@ -23,7 +23,7 @@ public class ChangeEvent {
 	 * @param difference
 	 *            deposit change
 	 */
-	public ChangeEvent(long version, long difference) {
+	public UpdateEvent(long version, long difference) {
 		this.version = version;
 		this.difference = difference;
 	}
