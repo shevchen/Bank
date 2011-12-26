@@ -21,7 +21,7 @@ public class ConsoleMain {
 	 * 
 	 * @param command
 	 *            {"deposit", account, amount}
-	 * @return true if operation is successful, false else
+	 * @return false if command has wrong format, true else
 	 */
 	private static boolean tryDeposit(String[] command) {
 		if (command.length != 3) {
@@ -57,7 +57,7 @@ public class ConsoleMain {
 	 * 
 	 * @param command
 	 *            {"withdraw", account, amount}
-	 * @return true if operation is successful, false else
+	 * @return false if command has wrong format, true else
 	 */
 	private static boolean tryWithdraw(String[] command) {
 		if (command.length != 3) {
@@ -93,7 +93,7 @@ public class ConsoleMain {
 	 * 
 	 * @param command
 	 *            {"transfer", accountFrom, accountTo, amount}
-	 * @return true if operation is successful, false else
+	 * @return false if command has wrong format, true else
 	 */
 	private static boolean tryTransfer(String[] command) {
 		if (command.length != 4) {
@@ -130,7 +130,7 @@ public class ConsoleMain {
 	 * 
 	 * @param command
 	 *            {"amount", account}
-	 * @return true if operation is successful, false else
+	 * @return false if command has wrong format, true else
 	 */
 	private static boolean tryGetAmount(String[] command) {
 		if (command.length != 2) {
@@ -163,7 +163,7 @@ public class ConsoleMain {
 	 * 
 	 * @param command
 	 *            {"total"}
-	 * @return true if operation is successful, false else
+	 * @return false if command has wrong format, true else
 	 */
 	private static boolean tryGetTotalAmount(String[] command) {
 		if (command.length != 1) {
