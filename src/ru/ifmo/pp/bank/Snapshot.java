@@ -107,7 +107,7 @@ public class Snapshot {
 		long result = accounts[n];
 		for (int i = 0; i < events.size(); ++i) {
 			ChangeEvent e = events.get(i);
-			if (e.getVersion() > version.get()) {
+			if (e.getVersion() > version) {
 				break;
 			}
 			if (e.getAccount() == n) {
