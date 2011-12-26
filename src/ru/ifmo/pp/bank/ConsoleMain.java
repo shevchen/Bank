@@ -46,9 +46,8 @@ public class ConsoleMain {
 					+ bank.deposit(account, amount));
 		} catch (Exception e) {
 			String message = e.getMessage();
-			System.out
-					.println("Invalid operation: " + message == null ? "undefined"
-							: message);
+			System.out.println("Invalid operation: "
+					+ (message == null ? "undefined" : message));
 		}
 		return true;
 	}
@@ -81,9 +80,8 @@ public class ConsoleMain {
 					+ bank.withdraw(account, amount));
 		} catch (Exception e) {
 			String message = e.getMessage();
-			System.out
-					.println("Invalid operation: " + message == null ? "undefined"
-							: message);
+			System.out.println("Invalid operation: "
+					+ (message == null ? "undefined" : message));
 		}
 		return true;
 	}
@@ -118,9 +116,8 @@ public class ConsoleMain {
 					+ " from account " + from + " to account " + to);
 		} catch (Exception e) {
 			String message = e.getMessage();
-			System.out
-					.println("Invalid operation: " + message == null ? "undefined"
-							: message);
+			System.out.println("Invalid operation: "
+					+ (message == null ? "undefined" : message));
 		}
 		return true;
 	}
@@ -150,9 +147,8 @@ public class ConsoleMain {
 					+ bank.getAmount(account));
 		} catch (Exception e) {
 			String message = e.getMessage();
-			System.out
-					.println("Invalid operation: " + message == null ? "undefined"
-							: message);
+			System.out.println("Invalid operation: "
+					+ (message == null ? "undefined" : message));
 		}
 		return true;
 	}
@@ -241,9 +237,8 @@ public class ConsoleMain {
 						+ snapshots.get(command[2]).getAmount(account));
 			} catch (Exception e) {
 				String message = e.getMessage();
-				System.out
-						.println("Invalid operation: " + message == null ? "undefined"
-								: message);
+				System.out.println("Invalid operation: "
+						+ (message == null ? "undefined" : message));
 			}
 		}
 		return true;
