@@ -58,7 +58,8 @@ public class Bank {
 		money = new AtomicLongArray(n);
 		changes = createList();
 		totalAmount = 0;
-		localSnapshot = new Snapshot(actualVersion, money, changes);
+		localSnapshot = new Snapshot(actualVersion, new AtomicLongArray(n),
+				changes);
 	}
 
 	private List<List<ChangeEvent>> createList() {
@@ -112,9 +113,8 @@ public class Bank {
 			for (int i = 0; i < n; ++i) {
 				newArray.set(i, money.get(i));
 			}
-			money = newArray;
 			changes = createList();
-			localSnapshot = new Snapshot(actualVersion, money, changes);
+			localSnapshot = new Snapshot(actualVersion, newArray, changes);
 		}
 	}
 

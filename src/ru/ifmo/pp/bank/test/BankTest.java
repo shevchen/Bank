@@ -218,6 +218,7 @@ public class BankTest {
 		Assert.assertEquals(s.getAmount(0), 0);
 		Assert.assertEquals(s.getAmount(1), 0);
 		b.deposit(0, 5);
+		Assert.assertEquals(s.getAmount(0), 0);
 		b.deposit(1, 10);
 		s = b.snapshot();
 		Assert.assertEquals(s.getAmount(0), 5);
@@ -228,7 +229,7 @@ public class BankTest {
 	public void testSnapshot2() {
 		final int ACC = 10;
 		Bank b = new Bank(ACC);
-		for (int i = 0; i < 100000; ++i) {
+		for (int i = 0; i < 1000; ++i) {
 			for (int j = 0; j < ACC; ++j) {
 				b.deposit(j, 1);
 			}
@@ -322,7 +323,7 @@ public class BankTest {
 			runnables[i] = new TestRunnable() {
 				@Override
 				public void runTest() throws Throwable {
-					for (int i = 0; i < 500; ++i) {
+					for (int i = 0; i < 490; ++i) {
 						boolean succeeded = false;
 						do {
 							succeeded = true;
@@ -339,12 +340,12 @@ public class BankTest {
 		MultiThreadedTestRunner runner = new MultiThreadedTestRunner(runnables);
 		runner.runTestRunnables();
 		Assert.assertEquals(b.getAmount(0), 10000);
-		Assert.assertEquals(b.getAmount(1), 0);
+		Assert.assertEquals(b.getAmount(1), 100);
 	}
 
 	@Test
 	public void testSyncOperations3() throws Throwable {
-		final int ACC = 10;
+		final int ACC = 100;
 		final Bank b = new Bank(ACC);
 		TestRunnable[] runnables = new TestRunnable[2];
 		runnables[0] = new TestRunnable() {
@@ -357,7 +358,7 @@ public class BankTest {
 				}
 			}
 		};
-		final Snapshot[] s = new Snapshot[500];
+		final Snapshot[] s = new Snapshot[50];
 		runnables[1] = new TestRunnable() {
 			@Override
 			public void runTest() throws Throwable {
