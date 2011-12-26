@@ -209,10 +209,10 @@ public class Bank {
 		money.set(fromIndex, newFromValue);
 		money.set(toIndex, newToValue);
 		curSnapshot.addEvent(new ChangeEvent(
-				curSnapshot.getVersion().get() + 1, fromIndex, -amount));
+				curSnapshot.getVersion() + 1, fromIndex, -amount));
 		curSnapshot.addEvent(new ChangeEvent(
-				curSnapshot.getVersion().get() + 1, toIndex, amount));
-		curSnapshot.getVersion().incrementAndGetVersion();
+				curSnapshot.getVersion() + 1, toIndex, amount));
+		curSnapshot.incrementAndGetVersion();
 		checkForUpdate();
 	}
 }
