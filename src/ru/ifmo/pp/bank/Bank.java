@@ -1,6 +1,6 @@
 package ru.ifmo.pp.bank;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLongArray;
 
@@ -57,9 +57,9 @@ public class Bank {
 	}
 
 	private List<List<ChangeEvent>> createList() {
-		List<List<ChangeEvent>> list = new LinkedList<List<ChangeEvent>>();
+		List<List<ChangeEvent>> list = new ArrayList<List<ChangeEvent>>();
 		for (int i = 0; i < n; ++i) {
-			list.add(new LinkedList<ChangeEvent>());
+			list.add(new ArrayList<ChangeEvent>());
 		}
 		return list;
 	}
