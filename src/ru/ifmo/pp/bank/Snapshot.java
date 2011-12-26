@@ -33,6 +33,8 @@ public class Snapshot {
 	 *            bank accounts
 	 * @param events
 	 *            change events
+	 * @param isMutable
+	 *            snapshot mutability
 	 */
 	public Snapshot(long version, AtomicLongArray money,
 			List<List<UpdateEvent>> events, boolean isMutable) {
@@ -49,6 +51,8 @@ public class Snapshot {
 	 *            old one
 	 * @param actualVersion
 	 *            actual bank version
+	 * @param isMutable
+	 *            snapshot mutability
 	 */
 	public Snapshot(Snapshot oldSnapshot, long actualVersion, boolean isMutable) {
 		this.money = oldSnapshot.money;
