@@ -14,7 +14,7 @@ public class Bank {
 	/**
 	 * The number of changes between two consecutive snapshot refreshes.
 	 */
-	private final int UPDATE_PERIOD = 100;
+	private final int UPDATE_PERIOD;
 
 	/**
 	 * Number of accounts.
@@ -47,6 +47,7 @@ public class Bank {
 			n = 0;
 		}
 		this.n = n;
+		UPDATE_PERIOD = this.n;
 		money = new AtomicLongArray(n);
 		totalAmount = 0;
 		curSnapshot = new Snapshot(money, 0L);
