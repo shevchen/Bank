@@ -1,6 +1,5 @@
 package ru.ifmo.pp.bank;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLongArray;
 
@@ -11,29 +10,17 @@ public class Snapshot {
 	/**
 	 * Snapshot version.
 	 */
-	private volatile long version;
+	private long version;
 
 	/**
 	 * Amounts of money for every account.
 	 */
-	private long[] accounts;
+	private AtomicLongArray accounts;
 
 	/**
 	 * New events of account changes.
 	 */
-	private List<ChangeEvent> events;
-
-	/**
-	 * Creates a new bank snapshot from an existing one.
-	 * 
-	 * @param s
-	 *            an old snapshot
-	 */
-	public Snapshot(Snapshot s, long version) {
-		this.version = version;
-		this.accounts = s.getAccounts();
-		this.events = s.getEvents();
-	}
+	private List<List<ChangeEvent>> events;
 
 	/**
 	 * Creates a new bank snapshot.
@@ -45,50 +32,43 @@ public class Snapshot {
 	 * @param events
 	 *            change events
 	 */
-	public Snapshot(AtomicLongArray accounts, long version) {
+	public Snapshot(long version, AtomicLongArray accounts,
+			List<List<ChangeEvent>> events) {
 		this.version = version;
-		this.accounts = new long[accounts.length()];
-		for (int i = 0; i < this.accounts.length; ++i) {
-			this.accounts[i] = accounts.get(i);
-		}
-		this.events = new ArrayList<ChangeEvent>();
+		this.accounts = accounts;
+		this.events = events;
 	}
 
 	/**
-	 * Returns current version.
+	 * Creates a new snapshot made from the old one.
 	 * 
-	 * @return current version
+	 * @param oldSnapshot
+	 *            old one
+	 * @param actualVersion
+	 *            actual bank version
 	 */
-	public long getVersion() {
-		return version;
+	public Snapshot(Snapshot oldSnapshot, long actualVersion) {
+		this.accounts = oldSnapshot.getAccounts();
+		this.events = oldSnapshot.getEvents();
+		this.version = actualVersion;
 	}
 
 	/**
-	 * Returns bank accounts.
+	 * Retrieves all the deposits.
 	 * 
-	 * @return bank accounts
+	 * @return money on deposits at the last update
 	 */
-	public long[] getAccounts() {
+	public AtomicLongArray getAccounts() {
 		return accounts;
 	}
 
 	/**
-	 * Returns new events.
+	 * Retrieves all changes.
 	 * 
-	 * @return new change events
+	 * @return all changes made since the last update
 	 */
-	public List<ChangeEvent> getEvents() {
+	public List<List<ChangeEvent>> getEvents() {
 		return events;
-	}
-
-	/**
-	 * Adds the new event to the end of the list.
-	 * 
-	 * @param e
-	 *            the new event
-	 */
-	public void addEvent(ChangeEvent e) {
-		events.add(e);
 	}
 
 	/**
@@ -101,23 +81,17 @@ public class Snapshot {
 	 *             when n is invalid index.
 	 */
 	public long getAmount(int n) {
-		if (n < 0 || n >= accounts.length) {
+		if (n < 0 || n >= accounts.length()) {
 			throw new IllegalArgumentException("Invalid index: " + n);
 		}
-		long result = accounts[n];
-		for (int i = 0; i < events.size(); ++i) {
-			ChangeEvent e = events.get(i);
+		long result = accounts.get(n);
+		for (int i = 0; i < events.get(n).size(); ++i) {
+			ChangeEvent e = events.get(n).get(i);
 			if (e.getVersion() > version) {
 				break;
 			}
-			if (e.getAccount() == n) {
-				result += e.getDifference();
-			}
+			result += e.getDifference();
 		}
 		return result;
-	}
-
-	public long incrementAndGetVersion() {
-		return ++version;
 	}
 }

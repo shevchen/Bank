@@ -357,28 +357,31 @@ public class BankTest {
 				}
 			}
 		};
+		final Snapshot[] s = new Snapshot[500];
 		runnables[1] = new TestRunnable() {
 			@Override
 			public void runTest() throws Throwable {
-				for (int i = 0; i < 100; ++i) {
-					Snapshot s = b.snapshot();
-					long min = Long.MAX_VALUE;
-					long max = Long.MIN_VALUE;
-					for (int j = 0; j < ACC; ++j) {
-						long amount = s.getAmount(j);
-						if (amount > max) {
-							max = amount;
-						}
-						if (amount < min) {
-							min = amount;
-						}
-					}
-					Assert.assertTrue(max >= min);
-					Assert.assertTrue(max - min <= 1);
+				for (int i = 0; i < s.length; ++i) {
+					s[i] = b.snapshot();
 				}
 			}
 		};
 		MultiThreadedTestRunner runner = new MultiThreadedTestRunner(runnables);
 		runner.runTestRunnables();
+		for (int i = 0; i < s.length; ++i) {
+			long min = Long.MAX_VALUE;
+			long max = Long.MIN_VALUE;
+			for (int j = 0; j < ACC; ++j) {
+				long amount = s[i].getAmount(j);
+				if (amount > max) {
+					max = amount;
+				}
+				if (amount < min) {
+					min = amount;
+				}
+			}
+			Assert.assertTrue(max >= min);
+			Assert.assertTrue(max - min <= 1);
+		}
 	}
 }

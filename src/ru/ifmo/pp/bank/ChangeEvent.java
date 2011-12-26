@@ -11,11 +11,6 @@ public class ChangeEvent {
 	private long version;
 
 	/**
-	 * Account number.
-	 */
-	private int account;
-
-	/**
 	 * The difference between the old and new amounts of money.
 	 */
 	private long difference;
@@ -25,14 +20,11 @@ public class ChangeEvent {
 	 * 
 	 * @param version
 	 *            current snapshot version
-	 * @param account
-	 *            account number
 	 * @param difference
 	 *            deposit change
 	 */
-	public ChangeEvent(long version, int account, long difference) {
+	public ChangeEvent(long version, long difference) {
 		this.version = version;
-		this.account = account;
 		this.difference = difference;
 	}
 
@@ -43,15 +35,6 @@ public class ChangeEvent {
 	 */
 	public long getVersion() {
 		return version;
-	}
-
-	/**
-	 * Returns the account number.
-	 * 
-	 * @return the account number.
-	 */
-	public int getAccount() {
-		return account;
 	}
 
 	/**

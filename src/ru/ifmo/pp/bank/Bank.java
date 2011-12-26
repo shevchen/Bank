@@ -1,5 +1,7 @@
 package ru.ifmo.pp.bank;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLongArray;
 
 /**
@@ -12,14 +14,14 @@ public class Bank {
 	public static final long MAX_AMOUNT = 1000000000000000L;
 
 	/**
-	 * The number of changes between two consecutive snapshot refreshes.
-	 */
-	private final int UPDATE_PERIOD;
-
-	/**
 	 * Number of accounts.
 	 */
 	private final int n;
+
+	/**
+	 * Current bank version.
+	 */
+	private volatile long actualVersion;
 
 	/**
 	 * Current money amounts for all accounts.
@@ -27,14 +29,19 @@ public class Bank {
 	private volatile AtomicLongArray money;
 
 	/**
+	 * Deposit updates.
+	 */
+	private volatile List<List<ChangeEvent>> changes;
+
+	/**
 	 * Total money amount.
 	 */
 	private volatile long totalAmount;
 
 	/**
-	 * Current snapshot.
+	 * Local snapshot.
 	 */
-	private volatile Snapshot curSnapshot;
+	private volatile Snapshot localSnapshot;
 
 	/**
 	 * Creates new bank instance.
@@ -47,10 +54,19 @@ public class Bank {
 			n = 0;
 		}
 		this.n = n;
-		UPDATE_PERIOD = n;
+		actualVersion = 0;
 		money = new AtomicLongArray(n);
+		changes = createList();
 		totalAmount = 0;
-		curSnapshot = new Snapshot(money, 0L);
+		localSnapshot = new Snapshot(actualVersion, money, changes);
+	}
+
+	private List<List<ChangeEvent>> createList() {
+		List<List<ChangeEvent>> changes = new LinkedList<List<ChangeEvent>>();
+		for (int i = 0; i < n; ++i) {
+			changes.add(new LinkedList<ChangeEvent>());
+		}
+		return changes;
 	}
 
 	/**
@@ -84,22 +100,26 @@ public class Bank {
 	 * @return snapshot of amounts in all accounts.
 	 */
 	public Snapshot snapshot() {
-		Snapshot s = curSnapshot;
-		return new Snapshot(s, s.getVersion());
+		return new Snapshot(localSnapshot, actualVersion);
 	}
 
 	/**
 	 * Checks and, if necessary, updates the current snapshot.
 	 */
 	private void checkForUpdate() {
-		long version = curSnapshot.getVersion();
-		if (version % UPDATE_PERIOD == 0) {
-			curSnapshot = new Snapshot(money, version);
+		if (actualVersion % n == 0) {
+			AtomicLongArray newArray = new AtomicLongArray(n);
+			for (int i = 0; i < n; ++i) {
+				newArray.set(i, money.get(i));
+			}
+			money = newArray;
+			changes = createList();
+			localSnapshot = new Snapshot(actualVersion, money, changes);
 		}
 	}
 
 	/**
-	 * Deposits specified amount to account.
+	 * Deposits the specified amount if money to account.
 	 * 
 	 * @param i
 	 *            account index.
@@ -126,8 +146,10 @@ public class Bank {
 							+ MAX_AMOUNT);
 		}
 		money.set(i, newValue);
-		totalAmount += newValue;
-		curSnapshot.addEvent(new ChangeEvent(curSnapshot.incrementAndGetVersion(), i, amount));
+		totalAmount += amount;
+		long v = actualVersion + 1;
+		changes.get(i).add(new ChangeEvent(v, amount));
+		actualVersion = v;
 		checkForUpdate();
 		return newValue;
 	}
@@ -160,7 +182,9 @@ public class Bank {
 		}
 		money.set(i, newValue);
 		totalAmount -= amount;
-		curSnapshot.addEvent(new ChangeEvent(curSnapshot.incrementAndGetVersion(), i, -amount));
+		long v = actualVersion + 1;
+		changes.get(i).add(new ChangeEvent(v, -amount));
+		actualVersion = v;
 		checkForUpdate();
 		return newValue;
 	}
@@ -208,11 +232,10 @@ public class Bank {
 		}
 		money.set(fromIndex, newFromValue);
 		money.set(toIndex, newToValue);
-		curSnapshot.addEvent(new ChangeEvent(
-				curSnapshot.getVersion() + 1, fromIndex, -amount));
-		curSnapshot.addEvent(new ChangeEvent(
-				curSnapshot.getVersion() + 1, toIndex, amount));
-		curSnapshot.incrementAndGetVersion();
+		long v = actualVersion + 1;
+		changes.get(fromIndex).add(new ChangeEvent(v, -amount));
+		changes.get(toIndex).add(new ChangeEvent(v, amount));
+		actualVersion = v;
 		checkForUpdate();
 	}
 }
