@@ -49,7 +49,7 @@ public class Bank {
 		this.n = n;
 		money = new AtomicLongArray(n);
 		totalAmount = 0;
-		curSnapshot = new Snapshot(money);
+		curSnapshot = new Snapshot(money, 0L);
 	}
 
 	/**
@@ -93,9 +93,7 @@ public class Bank {
 	private void checkForUpdate() {
 		long version = curSnapshot.getVersion().get();
 		if (version % UPDATE_PERIOD == 0) {
-			Snapshot s = new Snapshot(curSnapshot, version);
-			s.applyChanges();
-			curSnapshot = s;
+			curSnapshot = new Snapshot(money, version);
 		}
 	}
 

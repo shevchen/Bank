@@ -46,8 +46,8 @@ public class Snapshot {
 	 * @param events
 	 *            change events
 	 */
-	public Snapshot(AtomicLongArray accounts) {
-		this.version = new AtomicLong(0);
+	public Snapshot(AtomicLongArray accounts, long version) {
+		this.version = new AtomicLong(version);
 		this.accounts = new long[accounts.length()];
 		for (int i = 0; i < this.accounts.length; ++i) {
 			this.accounts[i] = accounts.get(i);
@@ -74,7 +74,7 @@ public class Snapshot {
 	}
 
 	/**
-	 * returns new events.
+	 * Returns new events.
 	 * 
 	 * @return new change events
 	 */
@@ -116,16 +116,5 @@ public class Snapshot {
 			}
 		}
 		return result;
-	}
-
-	/**
-	 * Applies the changes list. The list has to remain constant during this
-	 * operation.
-	 */
-	public void applyChanges() {
-		for (ChangeEvent e : events) {
-			accounts[e.getAccount()] += e.getDifference();
-		}
-		events.clear();
 	}
 }
