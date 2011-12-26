@@ -265,7 +265,7 @@ public class ConsoleMain {
 		System.out.println("Commands available:");
 		System.out.println("deposit <account> <amount>,");
 		System.out.println("withdraw <account> <amount>,");
-		System.out.println("deposit <accountFrom> <accountTo> <amount>,");
+		System.out.println("transfer <accountFrom> <accountTo> <amount>,");
 		System.out.println("amount <account>,");
 		System.out.println("total,");
 		System.out.println("snapshot make <id>,");
