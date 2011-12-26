@@ -381,8 +381,7 @@ public class BankTest {
 					min = amount;
 				}
 			}
-			// Assert.assertTrue(max >= min);
-			// Assert.assertTrue(max - min <= 1);
+			Assert.assertTrue(max >= min && max <= min + 1);
 		}
 	}
 }
